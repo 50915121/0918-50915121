@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剪刀石頭布遊戲</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .choice {
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+        .choice:hover {
+            transform: scale(1.1);
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>剪刀石頭布遊戲</h1>
+    <div class="choice" onclick="play('剪刀')">
+        <img src="https://www.9x9.tw/autopic/220224004107_01.jpg" alt="剪刀" width="100">
+    </div>
+    <div class="choice" onclick="play('石頭')">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWZ0JSLaonpwMGtrsQESJcpj7j5fB7tUIiHQ&s" alt="石頭" width="100">
+    </div>
+    <div class="choice" onclick="play('布')">
+        <img src="https://gcs.rimg.com.tw/g1/5/80/45/21832458222661_657.jpg" alt="布" width="100">
+    </div>
+
+    <div id="score">你: 0 - 電腦: 0</div>
+    <button onclick="resetScore()">重置比分</button>
+
+    <!-- 音效 -->
+    <audio id="winSound" src="https://www.soundjay.com/buttons/sounds/button-2.mp3"></audio>
+    <audio id="loseSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+    <audio id="drawSound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let userScore = 0;
+        let computerScore = 0;
+
+        function play(userChoice) {
+            const choices = ['剪刀', '石頭', '布'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+            let result;
+
+            if (userChoice === computerChoice) {
+                result = '平局！';
+                document.getElementById('drawSound').play();
+            } else if (
+                (userChoice === '剪刀' && computerChoice === '布') ||
+                (userChoice === '石頭' && computerChoice === '剪刀') ||
+                (userChoice === '布' && computerChoice === '石頭')
+            ) {
+                result = '你贏了！';
+                userScore++;
+                document.getElementById('winSound').play();
+            } else {
+                result = '你輸了！';
+                computerScore++;
+                document.getElementById('loseSound').play();
+            }
+
+            updateScore();
+
+            // 檢查誰贏得了三局
+            if (userScore === 3 || computerScore === 3) {
+                const winner = userScore === 3 ? '你贏得了整場比賽！' : '電腦贏得了整場比賽！';
+                Swal.fire({
+                    title: '遊戲結束',
+                    text: `${winner}\n你: ${userScore} - 電腦: ${computerScore}`,
+                    icon: userScore === 3 ? 'success' : 'error',
+                    confirmButtonText: '重新開始'
+                }).then(() => {
+                    resetGame();
+                });
+            } else {
+                Swal.fire({
+                    title: '結果',
+                    text: `你選擇了: ${userChoice}\n電腦選擇了: ${computerChoice}\n${result}\n你: ${userScore} - 電腦: ${computerScore}`,
+                    icon: result === '平局！' ? 'info' : (result === '你贏了！' ? 'success' : 'error'),
+                    confirmButtonText: '確定'
+                });
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = `你: ${userScore} - 電腦: ${computerScore}`;
+        }
+
+        function resetScore() {
+            userScore = 0;
+            computerScore = 0;
+            updateScore();
+        }
+
+        function resetGame() {
+            resetScore();
+        }
+    </script>
+</body>
+</html>
